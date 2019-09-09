@@ -1,0 +1,34 @@
+#+STARTUP: showall
+#+OPTIONS: toc:nil
+#+TITLE: Rubric: Very Simple Shell - Phase a
+#+SUBTITLE: CIS 310: Operating Systems
+#+AUTHOR: Brian C. Ladd
+#+DATE: Fall 2019
+
+*REASONS TO STOP GRADING*
+- Failure to compile.
+- No =README=
+  - No ID block in =README=
+  - No instructions on compiling and running
+- =.h= / =.cpp= file with no ID block
+*REASONS TO STOP GRADING*
+
+Documentation            /30
+- Good type, function, and variable names
+  - Descriptive names
+  - Name length directly proportional to size of scope:
+    larger scope -_ longer name
+- README
+  - Problem Statement
+  - Testing Criteria
+  - Compiling and Running Instructions
+
+Design                   /30
+
+
+Implementation           /30
+- Proper use of git
+  - Pushed to git server for turn in
+  - Multiple short commits rather than one monster commit
+
+Aesthetics               /10
