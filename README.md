@@ -1,12 +1,12 @@
 # ID Block Information
-* @author Eric zair
+
+* @author Eric Zair
 * @email zairea200@potsdam.edu
 * @course CIS 310 Operating Systems
-* @assignment p001
-* @due 09/4/2019
+* @assignment p002
+* @due 09/11/2019
 
-
-# Program Description
+## Program Description
 
 The purpose of this program is to create a "Shell" class in C++.
 
@@ -14,7 +14,7 @@ Essentially, the Shell class will take in user input in the form of a string. Th
 
 NOTE: The main program will return status code from the Shell class. If the return code is 0, then we have no errors. If the return code is not 0...well, we have issues.
 
-# How To Run
+## How To Run
 
 There are 2 very simple ways to execute this program.
 
@@ -36,11 +36,11 @@ The other way to run the program is to call the following command:
 
 This will build and run the program.
 
-# Doxygen & Documentation
+## Doxygen & Documentation
 
 Comments in this program are done in a format that supports using doxygen to generate .html documentation.
 
-## Generating Doxygen Documentation
+### Generating Doxygen Documentation
 
 To Generate doxygen documentation make sure that doxygen is proeprly installed on your system.
 
@@ -56,11 +56,11 @@ Now that doxygen is installed on your computer, you can run the following comman
 
 Once executed, the documentation will be generated successfully.
 
-# Testing
+## Testing
 
 NOTE: Normally I would create/build unit tests for testing purposes, however, that feels a bit overkill for this assignment.
 
-## Testing Cases Used
+### Testing Cases Used
 
 In terms of testing cases, I tested the following strings passed in by the user:
 
@@ -76,6 +76,7 @@ In terms of testing cases, I tested the following strings passed in by the user:
 
 2. The case where "                x     y     z" is given in as a string:
         Output:
+
             ```
             vssh-a$                 x     y     z
             word[0] = x
@@ -86,6 +87,7 @@ In terms of testing cases, I tested the following strings passed in by the user:
 3. The case where " saomethingadiasdsai               y                 c         exit" is given as a string input:
 
         Output:
+
             ```
             vssh-a$  saomethingadiasdsai               y                 c         exit
             word[0] = saomethingadiasdsai
@@ -95,13 +97,16 @@ In terms of testing cases, I tested the following strings passed in by the user:
 
 4. The case where "something exit something" is given as a string input:
         Output:
+
             ```
             vssh-a$ something exit something
             word[0] = something
+
             ```
 
 5. The case where "ctrl+d" is given as a string input:
         Output:
+
             ```
             vssh-a$ ez@ez-Inspiron ~/Workspace/Classes/OS/p001 $
             ```
