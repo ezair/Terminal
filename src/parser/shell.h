@@ -33,13 +33,6 @@ class Shell {
     string shell_prompt_name;
 
     /**
-     * @brief This is the return code signaling whether or not
-     * the program executed properly.
-     *
-     */
-    int return_code;
-
-    /**
      * @brief Given a string string, we parse each token in it
      * (seperated by spaces) and add each token to a vector.
      * We then simply return that vector.
@@ -51,11 +44,32 @@ class Shell {
      */
     vector<string> vector_of_tokens_parsed_from_string(string str);
 
+    /**
+     * @brief Takes a vector<string> and returns it as a char array
+     * of strings.
+     *
+     * @param vec The vector that we want to return a char*[] version of.
+     *
+     * @return char* const char*[] containing all the same string values
+     *                             as the passed in vec parameter.
+     */
+    char* const vector_of_strings_to_array(vector<string> vec);
+
+    /**
+     * @brief Return if the program at a given path exists and is an exe.
+     *
+     * @param path_to_program location of the program that a user wants
+     *                        to see if it exists.
+     * @return true if file exists and is an exe
+     * @return false if file does not exists or file is not an exe.
+     */
+    bool exists_and_is_exe(string path_to_program);
+
+
  public:
     /**
      * @brief Construct a new Shell object.
      * This shell object simply emulates that of a terminal.
-     *
      */
     Shell() {
         this->shell_prompt_name = "vssh-a$";
@@ -63,29 +77,18 @@ class Shell {
 
     /**
      * @brief Destroy the Shell object.
-     *
      */
     ~Shell() {
         // Default Destructor.
     }
 
     /**
-     * @brief Loop through and wait for a user to enter commands via
-     *        user input. We then take those commands and execute them.
+     * @brief Waits for a user to enter a command. We then check if the
+     * command is valid and in the event that it is we simply execute it.
      *
+     * @return int  success code: 0 if no issues, 1 otherwise.
      */
-    void loop();
-
-    /**
-     * @brief Returns the return code of the shell.
-     * 0 means that we did not run into any issues.
-     * 1 implies that we ran into some issues.
-     *
-     * @return The status code of whether or not the program
-     *         executed correctly.
-     *
-     */
-    int returnCode();
+    int loop();
 };
 
 #endif  // SRC_PARSER_SHELL_H_

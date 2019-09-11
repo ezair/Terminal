@@ -35,7 +35,7 @@
 # Compiling x86 code on x86 Linux (or similar)
 #   CC - the C++ compiler to use
 #   ASM - the assembler to use
-CC := g++
+CC := g++-8
 ASM := nasm
 
 # Directory for compiled object files.
@@ -61,8 +61,10 @@ boot: ASMFLAGS = -fbin
 
 # LDFLAGS - flags for the linker
 #   -nostdlib  do not link the standard run-time library to the program
+#   -lstdc++fs link with the library (-l means this) stdc++-fs
+#              (the c++17 standard filesystem implementation)
 #   -static    link all libraries statically rather than dynamically
-LDFLAGS := -static
+LDFLAGS := -lstdc++fs -static
 ## FOR RawOS programs: LDFLAGS := -nostdlib
 
 # The information defined in the source directories

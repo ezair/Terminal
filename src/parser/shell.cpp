@@ -9,6 +9,9 @@
  * @copyright Copyright (c) 2019
  *
  */
+#include <bits/stdc++.h>
+#include <sys/wait.h>
+#include <unistd.h>
 #include <string>
 #include <vector>
 #include <iostream>
@@ -22,13 +25,10 @@ using std::getline;
 using std::vector;
 using std::stringstream;
 using std::endl;
+using std::strcat;
+using std::filesystem::exists;
+using std::filesystem::path;
 
-
-int Shell::returnCode() {
-    // Currently we only want to return the code for success.
-    // This will change later on (more than likely).
-    return 0;
-}
 
 vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
     vector<string> parsed_tokens_from_str;
@@ -40,7 +40,7 @@ vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
     return parsed_tokens_from_str;
 }
 
-void Shell::loop() {
+int Shell::loop() {
     while (true) {
         string user_input = "";
         cout << this->shell_prompt_name << " ";
@@ -56,11 +56,42 @@ void Shell::loop() {
         vector<string> command_args =
             this->vector_of_tokens_parsed_from_string(user_input);
 
-        for (unsigned int i = 0; i < command_args.size(); i++) {
-            if (command_args.at(i) == "exit")
-                return;
-            cout << "word[" << i << "] = " << command_args.at(i) << endl;
-        }
-        cout << endl;
+        // Bye bye, user.
+        if (command_args.at(0) == "exit")
+            return 0;
+
+        string path_to_exe = command_args.at(0);
+        if (exists_and_is_exe("/bin/" + path_to_exe))
+            path_to_exe = "/bin/" + path_to_exe;
+
+        else if (exists_and_is_exe("/usr/local/bin/" + path_to_exe))
+            path_to_exe = "usr/local/bin/" + path_to_exe;
+
+        else if (exists_and_is_exe("/usr/bin/" + path_to_exe))
+            path_to_exe = "/usr/bin/" + path_to_exe;
+        else
+            cout << "BAD" << endl;
+
+        execl(path_to_exe.c_str(),
+              this->vector_of_strings_to_array(command_args),
+              (const char*) nullptr);
     }
+    return 0;
+}
+
+
+char* const Shell::vector_of_strings_to_array(vector<string> vec) {
+    char** const array_of_command_args = new char * [vec.size()];
+    for (unsigned int i = 0; i < vec.size(); i++) {
+        char* const token_command_arg = new char[vec[i].size() + 1];
+        strcpy(token_command_arg, vec.at(i).c_str());
+        array_of_command_args[i] = token_command_arg;
+    }
+    return *array_of_command_args;
+}
+
+
+bool Shell::exists_and_is_exe(string path_to_program) {
+    return exists(path_to_program) &&
+           access(path_to_program.c_str(), X_OK) == 0;
 }

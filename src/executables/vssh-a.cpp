@@ -18,6 +18,5 @@
 
 int main(int argc, char const *argv[]) {
     Shell shell;
-    shell.loop();
-    return shell.returnCode();
+    return shell.loop();
 }
