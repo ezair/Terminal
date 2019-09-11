@@ -61,37 +61,66 @@ int Shell::loop() {
             return 0;
 
         string path_to_exe = command_args.at(0);
-        if (exists_and_is_exe("/bin/" + path_to_exe))
+
+        // Empty condition, nothing needs to be done here.
+        if ((path_to_exe.find("/") || path_to_exe.find("./")) &&
+                                      exists_and_is_exe(path_to_exe)) {
+           execute_program(path_to_exe.c_str(),
+                           this->vector_of_strings_to_array(command_args));
+        }
+        else if (exists_and_is_exe("/bin/" + path_to_exe)) {
             path_to_exe = "/bin/" + path_to_exe;
-
-        else if (exists_and_is_exe("/usr/local/bin/" + path_to_exe))
+            execute_program(path_to_exe.c_str(),
+                            this->vector_of_strings_to_array(command_args));
+        }
+        else if (exists_and_is_exe("/usr/local/bin/" + path_to_exe)) {
             path_to_exe = "usr/local/bin/" + path_to_exe;
-
-        else if (exists_and_is_exe("/usr/bin/" + path_to_exe))
+            execute_program(path_to_exe.c_str(),
+                            this->vector_of_strings_to_array(command_args));
+        }
+        else if (exists_and_is_exe("/usr/bin/" + path_to_exe)) {
             path_to_exe = "/usr/bin/" + path_to_exe;
+            execute_program(path_to_exe.c_str(),
+                            this->vector_of_strings_to_array(command_args));
+        }
         else
             cout << "BAD" << endl;
-
-        execl(path_to_exe.c_str(),
-              this->vector_of_strings_to_array(command_args),
-              (const char*) nullptr);
     }
     return 0;
 }
 
 
-char* const Shell::vector_of_strings_to_array(vector<string> vec) {
+char** const Shell::vector_of_strings_to_array(vector<string> vec) {
     char** const array_of_command_args = new char * [vec.size()];
     for (unsigned int i = 0; i < vec.size(); i++) {
         char* const token_command_arg = new char[vec[i].size() + 1];
         strcpy(token_command_arg, vec.at(i).c_str());
         array_of_command_args[i] = token_command_arg;
     }
-    return *array_of_command_args;
+    // array_of_command_args[vec.size() - 1] = NULL;
+    return array_of_command_args;
 }
 
 
 bool Shell::exists_and_is_exe(string path_to_program) {
     return exists(path_to_program) &&
            access(path_to_program.c_str(), X_OK) == 0;
+}
+
+
+int Shell::execute_program(string path_to_exe, char** const command_args) {
+    pid_t child_pid = fork();
+    if (child_pid) {
+        pid_t terminating_pid = 0;
+        int exit_status;
+
+        while (terminating_pid != child_pid)
+            terminating_pid = wait(&exit_status);
+
+        if (WIFEXITED(exit_status) && (WEXITSTATUS(exit_status) != 0))
+            return WEXITSTATUS(exit_status);
+    }
+    else
+        execv(path_to_exe.c_str(), command_args);
+    return 0;
 }

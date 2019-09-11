@@ -53,7 +53,7 @@ class Shell {
      * @return char* const char*[] containing all the same string values
      *                             as the passed in vec parameter.
      */
-    char* const vector_of_strings_to_array(vector<string> vec);
+    char** const vector_of_strings_to_array(vector<string> vec);
 
     /**
      * @brief Return if the program at a given path exists and is an exe.
@@ -64,6 +64,15 @@ class Shell {
      * @return false if file does not exists or file is not an exe.
      */
     bool exists_and_is_exe(string path_to_program);
+
+    /**
+     * @brief MORE ON THIS LATER.
+     * 
+     * @param path_to_exe 
+     * @param command 
+     * @return int 
+     */
+    int execute_program(string path_to_exe, char** const command);
 
 
  public:
