@@ -45,8 +45,8 @@ vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
 
 int Shell::loop() {
     while (1) {
-        string user_input = "";
         cout << this->prompt_location << " ";
+        string user_input = "";
 
         // In the event that we reach a EOF, wanna break our loop
         // and go back into the main where the program will exit.
@@ -92,27 +92,33 @@ int Shell::loop() {
             path_to_exe = "/usr/bin/" + path_to_exe;
             execute_program(path_to_exe.c_str(), command_args_as_array);
         }
-        else if (command_args.at(0) == "cd" && command_args.size() >= 2)
-            this->change_directory(command_args[1]);
+        else if (command_args.at(0) == "cd") {
+            if (command_args.size() >= 2)
+                this->change_directory(command_args[1]);
+            // The way the linux cd command works: if the user does NOT
+            // provide a second argument the program goes to home.
+            else
+                this->change_directory("~");
+        }
         else
             cout << "BAD" << endl;
 
         // We need to clean up all memory to avoid dumb leaks.
         command_args.clear();
         path_to_exe.clear();
-        free(command_args_as_array);
+        delete[] command_args_as_array;
     }
     return 0;
 }
 
 
 void Shell::change_directory(string directory) {
-    char cwd[1024];
+    char cwd[sizeof(directory.c_str())];
     chdir(directory.c_str());
     (getcwd(cwd, sizeof(cwd)));
     string temp(cwd);
     this->prompt_location = temp;
-    temp.clear();
+    cout << this->prompt_location << "I am here" << endl;
 }
 
 
@@ -142,7 +148,7 @@ int Shell::execute_program(string path_to_exe, char** const command_args) {
 
     if (child_pid != 0) {
         pid_t terminating_pid = 0;
-        int exit_status;
+        int exit_status = 0;
 
         while (terminating_pid != child_pid)
             terminating_pid = wait(&exit_status);

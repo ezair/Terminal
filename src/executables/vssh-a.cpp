@@ -18,5 +18,6 @@
 
 int main(int argc, char const *argv[]) {
     Shell shell;
-    return shell.loop();
+    int exit_code = shell.loop();
+    return exit_code;
 }
