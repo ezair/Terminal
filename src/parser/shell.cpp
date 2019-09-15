@@ -9,14 +9,17 @@
  * @copyright Copyright (c) 2019
  *
  */
+#include "shell.h"
+
 #include <bits/stdc++.h>
 #include <sys/wait.h>
 #include <unistd.h>
+#include <fcntl.h>
+
 #include <string>
 #include <vector>
 #include <iostream>
 #include <sstream>
-#include "shell.h"
 
 using std::string;
 using std::cin;
@@ -41,11 +44,12 @@ vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
 }
 
 int Shell::loop() {
-    while (true) {
+    while (1) {
         string user_input = "";
-        cout << this->shell_prompt_name << " ";
+        cout << this->prompt_location << " ";
 
-        // In the event that we reach a EOF, we exit the program.
+        // In the event that we reach a EOF, wanna break our loop
+        // and go back into the main where the program will exit.
         if (!getline(cin, user_input))
             break;
 
@@ -56,37 +60,59 @@ int Shell::loop() {
         vector<string> command_args =
             this->vector_of_tokens_parsed_from_string(user_input);
 
-        // Bye bye, user.
-        if (command_args.at(0) == "exit")
+        // In the event that the user just hits the enter key without
+        // typing anything, the list will be at length 0, which is a
+        // problem, since we access it's indexes multiple times after
+        // this line of code.
+        // Thus, we put this below statement here so that we ignore
+        // all below code  if the list is size == 0.
+        if (command_args.size() == 0)
+            continue;
+
+        // When "exit" is given alone, we should quit
+        if (command_args.at(0) == "exit" && command_args.size() == 1)
             return 0;
 
+        char** const command_args_as_array =
+            vector_of_strings_to_array(command_args);
         string path_to_exe = command_args.at(0);
 
-        // Empty condition, nothing needs to be done here.
-        if ((path_to_exe.find("/") || path_to_exe.find("./")) &&
-                                      exists_and_is_exe(path_to_exe)) {
-           execute_program(path_to_exe.c_str(),
-                           this->vector_of_strings_to_array(command_args));
+        if (path_to_exe[0] == '/') {
+           execute_program(path_to_exe.c_str(), command_args_as_array);
         }
         else if (exists_and_is_exe("/bin/" + path_to_exe)) {
             path_to_exe = "/bin/" + path_to_exe;
-            execute_program(path_to_exe.c_str(),
-                            this->vector_of_strings_to_array(command_args));
+            execute_program(path_to_exe.c_str(), command_args_as_array);
         }
         else if (exists_and_is_exe("/usr/local/bin/" + path_to_exe)) {
             path_to_exe = "usr/local/bin/" + path_to_exe;
-            execute_program(path_to_exe.c_str(),
-                            this->vector_of_strings_to_array(command_args));
+            execute_program(path_to_exe.c_str(), command_args_as_array);
         }
         else if (exists_and_is_exe("/usr/bin/" + path_to_exe)) {
             path_to_exe = "/usr/bin/" + path_to_exe;
-            execute_program(path_to_exe.c_str(),
-                            this->vector_of_strings_to_array(command_args));
+            execute_program(path_to_exe.c_str(), command_args_as_array);
         }
+        else if (command_args.at(0) == "cd" && command_args.size() >= 2)
+            this->change_directory(command_args[1]);
         else
             cout << "BAD" << endl;
+
+        // We need to clean up all memory to avoid dumb leaks.
+        command_args.clear();
+        path_to_exe.clear();
+        free(command_args_as_array);
     }
     return 0;
+}
+
+
+void Shell::change_directory(string directory) {
+    char cwd[1024];
+    chdir(directory.c_str());
+    (getcwd(cwd, sizeof(cwd)));
+    string temp(cwd);
+    this->prompt_location = temp;
+    temp.clear();
 }
 
 
@@ -97,7 +123,6 @@ char** const Shell::vector_of_strings_to_array(vector<string> vec) {
         strcpy(token_command_arg, vec.at(i).c_str());
         array_of_command_args[i] = token_command_arg;
     }
-    // array_of_command_args[vec.size() - 1] = NULL;
     return array_of_command_args;
 }
 
@@ -110,7 +135,12 @@ bool Shell::exists_and_is_exe(string path_to_program) {
 
 int Shell::execute_program(string path_to_exe, char** const command_args) {
     pid_t child_pid = fork();
-    if (child_pid) {
+
+    // Error occured with forking.
+    if (child_pid < 0)
+        return -1;
+
+    if (child_pid != 0) {
         pid_t terminating_pid = 0;
         int exit_status;
 
@@ -120,7 +150,8 @@ int Shell::execute_program(string path_to_exe, char** const command_args) {
         if (WIFEXITED(exit_status) && (WEXITSTATUS(exit_status) != 0))
             return WEXITSTATUS(exit_status);
     }
-    else
-        execv(path_to_exe.c_str(), command_args);
+    else {
+       execv(path_to_exe.c_str(), command_args);
+    }
     return 0;
 }

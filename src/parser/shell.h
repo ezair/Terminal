@@ -11,6 +11,7 @@
 #ifndef SRC_PARSER_SHELL_H_
     #define SRC_PARSER_SHELL_H_
 
+#include <unistd.h>
 #include <string>
 #include <iostream>
 #include <vector>
@@ -30,7 +31,7 @@ class Shell {
      * shell. You can think of it as the user's username that will be
      * displayed inside of the shell.
      */
-    string shell_prompt_name;
+    string prompt_location;
 
     /**
      * @brief Given a string string, we parse each token in it
@@ -67,10 +68,10 @@ class Shell {
 
     /**
      * @brief MORE ON THIS LATER.
-     * 
-     * @param path_to_exe 
-     * @param command 
-     * @return int 
+     *
+     * @param path_to_exe
+     * @param command
+     * @return int
      */
     int execute_program(string path_to_exe, char** const command);
 
@@ -81,14 +82,17 @@ class Shell {
      * This shell object simply emulates that of a terminal.
      */
     Shell() {
-        this->shell_prompt_name = "vssh-a$";
+        char cwd[1024];
+        (getcwd(cwd, sizeof(cwd)));
+        string temp(cwd);
+        this->prompt_location = temp;
     }
 
     /**
      * @brief Destroy the Shell object.
      */
     ~Shell() {
-        // Default Destructor.
+        this->prompt_location.clear();
     }
 
     /**
@@ -98,6 +102,13 @@ class Shell {
      * @return int  success code: 0 if no issues, 1 otherwise.
      */
     int loop();
+
+    /**
+     * @brief Change directory in shell to a given location.
+     *
+     * @param directory Location to move to in the shell.
+     */
+    void change_directory(string directory);
 };
 
 #endif  // SRC_PARSER_SHELL_H_

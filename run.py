@@ -25,7 +25,7 @@ def main():
     # so we just quit the program.
     if not exists('Makefile'):
         SystemExit('Error, missing make file! '
-                   'Please create a make file before executing this script')
+                   'Please create a Makefile before executing this script')
 
     # We want to make sure that we only run the make command in the event
     # that the executable is actually generated newly.
