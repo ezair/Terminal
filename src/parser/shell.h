@@ -77,8 +77,15 @@ class Shell {
      */
     int execute_program(string path_to_exe, char** const command);
 
+    /**
+     * @brief Change directory in shell to a given location.
+     *
+     * @param directory Location to move to in the shell.
+     */
+    void change_directory(string directory);
 
- public:
+
+public:
     /**
      * @brief Construct a new Shell object.
      * This shell object simply emulates that of a terminal.
@@ -104,13 +111,6 @@ class Shell {
      * @return int  success code: 0 if no issues, 1 otherwise.
      */
     int loop();
-
-    /**
-     * @brief Change directory in shell to a given location.
-     *
-     * @param directory Location to move to in the shell.
-     */
-    void change_directory(string directory);
 };
 
 #endif  // SRC_PARSER_SHELL_H_

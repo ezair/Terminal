@@ -33,23 +33,14 @@ using std::filesystem::exists;
 using std::filesystem::path;
 
 
-vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
-    vector<string> parsed_tokens_from_str;
-    stringstream token_in_str(str);
-    // Add each token to this vector, since it will be used later on in
-    // loop method.
-    while (token_in_str >> str)
-        parsed_tokens_from_str.push_back(str);
-    return parsed_tokens_from_str;
-}
-
 int Shell::loop() {
     while (true) {
         cout << this->prompt_location << " ";
         string user_input = "";
 
-        // In the event that we reach a EOF, wanna break our loop
-        // and go back into the main where the program will exit.
+        // This will exit the processs we are running.
+        // It is best to use exit() here instead of break...
+        // believe it or not...
         if (!getline(cin, user_input))
             exit(0);
 
@@ -103,7 +94,6 @@ int Shell::loop() {
         // functions and re-create it ourselves.
         else if (command_args.at(0) == "cd")
                 this->change_directory(command_args[1]);
-        // Something went wrong, the use needs to know.
         else
             cout << "Error: \"" + command_args.at(0) + "\" not found!"<< endl;
 
@@ -111,6 +101,18 @@ int Shell::loop() {
         delete[] command_args_as_array;
     }
     return 0;
+}
+
+// PRIVATE_FUNCTIONS__________________________________________________________
+
+vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
+    vector<string> parsed_tokens_from_str;
+    stringstream token_in_str(str);
+    // Add each token to this vector, since it will be used later on in
+    // loop method.
+    while (token_in_str >> str)
+        parsed_tokens_from_str.push_back(str);
+    return parsed_tokens_from_str;
 }
 
 
