@@ -4,7 +4,7 @@
  * @brief File containing the class definitions for our Shell class
  *        located inside of the "shell.h" file.
  * @version 0.1
- * @date 2019-09-01
+ * @date 2019-09-07
  *
  * @copyright Copyright (c) 2019
  *
@@ -44,7 +44,7 @@ vector<string> Shell::vector_of_tokens_parsed_from_string(string str) {
 }
 
 int Shell::loop() {
-    while (1) {
+    while (true) {
         cout << this->prompt_location << " ";
         string user_input = "";
 
@@ -56,7 +56,7 @@ int Shell::loop() {
         // We need to grab the user input, since it must be parsed
         // and searched for a specific keyterm. To do this, it is
         // best to use a vector, as we can store every single user input
-        // token given.
+        // token given without knowing the amount of memory to allocate.
         vector<string> command_args =
             this->vector_of_tokens_parsed_from_string(user_input);
 
@@ -73,17 +73,20 @@ int Shell::loop() {
         if (command_args.at(0) == "exit" && command_args.size() == 1)
             return 0;
 
+        // We use this array (that is now populated with all of the elements
+        // in the above vector, because the execv() function only takes c
+        // strings, not c++ string objects.
         char** const command_args_as_array =
             vector_of_strings_to_array(command_args);
-        string path_to_exe = command_args.at(0);
 
+        string path_to_exe = command_args.at(0);
+        // The user might want to execute a script in their current dir.
         if (path_to_exe[0] == '/') {
-           execute_program(path_to_exe.c_str(), command_args_as_array);
+            execute_program(("." + path_to_exe).c_str(), command_args_as_array);
         }
-        else if (exists_and_is_exe("/bin/" + path_to_exe)) {
-            path_to_exe = "/bin/" + path_to_exe;
-            execute_program(path_to_exe.c_str(), command_args_as_array);
-        }
+        // THESE NEXT 3 CASES are used because exe programs like "ls"
+        // and "pwd" are storedin /bin folders. We call them to replicate
+        // the functionality of a terminal.
         else if (exists_and_is_exe("/usr/local/bin/" + path_to_exe)) {
             path_to_exe = "usr/local/bin/" + path_to_exe;
             execute_program(path_to_exe.c_str(), command_args_as_array);
@@ -92,6 +95,12 @@ int Shell::loop() {
             path_to_exe = "/usr/bin/" + path_to_exe;
             execute_program(path_to_exe.c_str(), command_args_as_array);
         }
+        else if (exists_and_is_exe("/bin/" + path_to_exe)) {
+            path_to_exe = "/bin/" + path_to_exe;
+            execute_program(path_to_exe.c_str(), command_args_as_array);
+        }
+        // Since "cd" is NOT an exe on the computer, we use built in c
+        // functions and re-create it ourselves.
         else if (command_args.at(0) == "cd") {
             if (command_args.size() >= 2)
                 this->change_directory(command_args[1]);
@@ -101,11 +110,9 @@ int Shell::loop() {
                 this->change_directory("~");
         }
         else
-            cout << "BAD" << endl;
+            cout << "Error: \"" + command_args.at(0) + "\" not found!"<< endl;
 
         // We need to clean up all memory to avoid dumb leaks.
-        command_args.clear();
-        path_to_exe.clear();
         delete[] command_args_as_array;
     }
     return 0;
@@ -113,22 +120,22 @@ int Shell::loop() {
 
 
 void Shell::change_directory(string directory) {
-    char cwd[sizeof(directory.c_str())];
+    char cwd[1024];
     chdir(directory.c_str());
     (getcwd(cwd, sizeof(cwd)));
     string temp(cwd);
     this->prompt_location = temp;
-    cout << this->prompt_location << "I am here" << endl;
 }
 
 
 char** const Shell::vector_of_strings_to_array(vector<string> vec) {
-    char** const array_of_command_args = new char * [vec.size()];
+    char** const array_of_command_args = new char * [vec.size() + 1];
     for (unsigned int i = 0; i < vec.size(); i++) {
-        char* const token_command_arg = new char[vec[i].size() + 1];
+        char* const token_command_arg = new char[vec[i].size()];
         strcpy(token_command_arg, vec.at(i).c_str());
         array_of_command_args[i] = token_command_arg;
     }
+    array_of_command_args[vec.size()] = nullptr;
     return array_of_command_args;
 }
 
@@ -150,6 +157,7 @@ int Shell::execute_program(string path_to_exe, char** const command_args) {
         pid_t terminating_pid = 0;
         int exit_status = 0;
 
+        // We need to wait til the process is actuatlly done running.
         while (terminating_pid != child_pid)
             terminating_pid = wait(&exit_status);
 
@@ -157,7 +165,9 @@ int Shell::execute_program(string path_to_exe, char** const command_args) {
             return WEXITSTATUS(exit_status);
     }
     else {
-       execv(path_to_exe.c_str(), command_args);
+        // int input_file_descriptor = open("src/parser/shell.cpp", O_RDONLY);
+        // dup2(input_file_descriptor, STDIN_FILENO);
+        execv(path_to_exe.c_str(), command_args);
     }
     return 0;
 }

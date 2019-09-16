@@ -13,7 +13,7 @@ from os.path import exists
 
 
 """ Set this to the path of the executable you want to run """
-PATH_TO_BUILDABLE_EXECUTABLE = 'build/vssh-a'
+PATH_TO_BUILDABLE_EXECUTABLE = 'build/vssh-b'
 
 
 def main():
