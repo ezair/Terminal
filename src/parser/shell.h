@@ -87,7 +87,7 @@ class Shell {
         char cwd[1024];
         (getcwd(cwd, sizeof(cwd)));
         string temp(cwd);
-        this->prompt_location = temp;
+        this->prompt_location = temp + "$";
     }
 
     /**

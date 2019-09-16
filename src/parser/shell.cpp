@@ -80,6 +80,7 @@ int Shell::loop() {
             vector_of_strings_to_array(command_args);
 
         string path_to_exe = command_args.at(0);
+
         // The user might want to execute a script in their current dir.
         if (path_to_exe[0] == '/')
             execute_program(("." + path_to_exe).c_str(), command_args_as_array);
@@ -100,14 +101,9 @@ int Shell::loop() {
         }
         // Since "cd" is NOT an exe on the computer, we use built in c
         // functions and re-create it ourselves.
-        else if (command_args.at(0) == "cd") {
-            if (command_args.size() >= 2)
+        else if (command_args.at(0) == "cd")
                 this->change_directory(command_args[1]);
-            // The way the linux cd command works: if the user does NOT
-            // provide a second argument the program goes to home.
-            else
-                this->change_directory("~");
-        }
+        // Something went wrong, the use needs to know.
         else
             cout << "Error: \"" + command_args.at(0) + "\" not found!"<< endl;
 
@@ -123,7 +119,7 @@ void Shell::change_directory(string directory) {
     chdir(directory.c_str());
     (getcwd(cwd, sizeof(cwd)));
     string temp(cwd);
-    this->prompt_location = temp;
+    this->prompt_location = temp + "$";
 }
 
 
