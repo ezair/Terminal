@@ -51,7 +51,7 @@ int Shell::loop() {
         // In the event that we reach a EOF, wanna break our loop
         // and go back into the main where the program will exit.
         if (!getline(cin, user_input))
-            break;
+            exit(0);
 
         // We need to grab the user input, since it must be parsed
         // and searched for a specific keyterm. To do this, it is
@@ -81,9 +81,8 @@ int Shell::loop() {
 
         string path_to_exe = command_args.at(0);
         // The user might want to execute a script in their current dir.
-        if (path_to_exe[0] == '/') {
+        if (path_to_exe[0] == '/')
             execute_program(("." + path_to_exe).c_str(), command_args_as_array);
-        }
         // THESE NEXT 3 CASES are used because exe programs like "ls"
         // and "pwd" are storedin /bin folders. We call them to replicate
         // the functionality of a terminal.
@@ -164,10 +163,7 @@ int Shell::execute_program(string path_to_exe, char** const command_args) {
         if (WIFEXITED(exit_status) && (WEXITSTATUS(exit_status) != 0))
             return WEXITSTATUS(exit_status);
     }
-    else {
-        // int input_file_descriptor = open("src/parser/shell.cpp", O_RDONLY);
-        // dup2(input_file_descriptor, STDIN_FILENO);
+    else
         execv(path_to_exe.c_str(), command_args);
-    }
     return 0;
 }

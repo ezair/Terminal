@@ -67,11 +67,13 @@ class Shell {
     bool exists_and_is_exe(string path_to_program);
 
     /**
-     * @brief MORE ON THIS LATER.
+     * @brief Fork and execute a given program.
      *
-     * @param path_to_exe
-     * @param command
-     * @return int
+     * @param path_to_exe Path to the program you want to execute.
+     * @param command The program command that you want to run.
+     *
+     * @return int -1 if failure.
+     * @return int 0 if success.
      */
     int execute_program(string path_to_exe, char** const command);
 
