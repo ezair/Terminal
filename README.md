@@ -4,11 +4,11 @@
 * @email zairea200@potsdam.edu
 * @course CIS 310 Operating Systems
 * @assignment p002
-* @due 09/11/2019
+* @due 09/16/2019
 
 ## Program Description
 
-Goal: To turn vssh-a from a simple string processor (that extracts wordsfrom lines of text) into a shell.A shell (like sh, bash, csh, etc.)
+Goal: To turn vssh-b from a simple string processor (that extracts wordsfrom lines of text) into a shell.A shell (like sh, bash, csh, etc.)
 
 1. Prompts the user.
 
